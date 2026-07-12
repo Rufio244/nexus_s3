@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>🔐 ปลดล็อคระบบ Nexus S3</title>
+    <style>
+        body {
+            background: #1a1a2e; min-height: 100vh; display: flex;
+            align-items: center; justify-content: center; font-family: sans-serif;
+        }
+        .box {
+            background: #fff; padding: 40px 50px; border-radius: 12px;
+            box-shadow: 0 0 30px rgba(26,35,126,0.3); text-align: center; max-width: 400px;
+        }
+        h2 { color: #1a237e; margin-bottom: 10px; }
+        .warn { color: #d32f2f; margin-bottom: 20px; }
+        input {
+            width: 100%; padding: 12px; margin: 10px 0 20px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: 16px; letter-spacing: 2px;
+        }
+        button {
+            background: #1a237e; color: #fff; border: none; padding: 12px 30px;
+            border-radius: 6px; font-size: 16px; cursor: pointer; width: 100%;
+        }
+        .msg { color: #d32f2f; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🔐 ระบบถูกล็อค</h2>
+        <p class="warn">ต้องใช้รหัสปลดล็อคหลักเพื่อเข้าใช้งานทั้งหมด</p>
+        {% if msg %}<div class="msg">{{ msg }}</div>{% endif %}
+        
+        <form method="POST">
+            <input type="text" name="master_code" placeholder="กรอกรหัสปลดล็อคหลัก" required>
+            <button type="submit">🔓 ปลดล็อคระบบ</button>
+        </form>
+    </div>
+</body>
+</html>
