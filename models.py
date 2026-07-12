@@ -55,4 +55,26 @@ class CMS:
 core = ChaniCore()
 biz = Business()
 cms = CMS()
+# 🛡️ ระบบล็อค-ปลดล็อคหลัก
+from config import MASTER_UNLOCK_CODE, LOCK_ALL_SYSTEM
+
+class SystemLock:
+    system_locked = LOCK_ALL_SYSTEM
+
+    def unlock(self, input_code):
+        if input_code == MASTER_UNLOCK_CODE:
+            self.system_locked = False
+            return {"ok": True, "msg": "✅ ปลดล็อคทั้งระบบสำเร็จ! พร้อมใช้งานทุกส่วน"}
+        return {"ok": False, "msg": "❌ รหัสปลดล็อคไม่ถูกต้อง"}
+
+    def lock_all(self, input_code):
+        if input_code == MASTER_UNLOCK_CODE:
+            self.system_locked = True
+            return {"ok": True, "msg": "🔐 ล็อคทั้งระบบสำเร็จ"}
+        return {"ok": False, "msg": "❌ ไม่มีสิทธิ์สั่งล็อคระบบ"}
+
+    def check_access(self):
+        return not self.system_locked
+
+sys_lock = SystemLock()
 
