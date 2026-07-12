@@ -1,29 +1,126 @@
-<div style="display:flex;height:90vh">
-    <!-- แชท AI -->
-    <div style="width:30%;background:#f5f5ff;padding:15px;overflow:auto">
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แผงควบคุม | Nexus S3</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #f0f2f5; padding: 10px; }
+        
+        /* ✅ โครงสร้างที่คุณต้องการ */
+        .editor-wrap { display: flex; height: 90vh; gap: 12px; }
+
+        /* 🤖 ส่วนแชท AI */
+        .chat-box {
+            width: 32%; background: #f5f5ff; padding: 18px; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+        .chat-box h3 { color: #1a237e; margin-bottom: 12px; }
+        .chat-log { flex: 1; overflow-y: auto; margin-bottom: 12px; padding: 8px; }
+        .msg { padding: 8px 12px; margin: 6px 0; border-radius: 16px; font-size: 14px; }
+        .user { background: #e3f2fd; margin-left: auto; }
+        .ai { background: #e8eaf6; margin-right: auto; }
+        .chat-input { display: flex; gap: 6px; }
+        .chat-input input {
+            flex: 1; padding: 10px 14px; border: 1px solid #ccc; border-radius: 20px;
+            outline: none;
+        }
+        .chat-input button {
+            padding: 10px 18px; background: #1a237e; color: #fff; border: none;
+            border-radius: 20px; cursor: pointer;
+        }
+
+        /* 🖥️ ส่วนแสดงตัวอย่างและแก้ไข */
+        .preview-area {
+            flex: 1; background: #fff; border-radius: 10px; padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-y: auto;
+        }
+        .preview-area h3 { color: #283593; margin-bottom: 18px; }
+        .editable {
+            outline: none; padding: 6px 8px; border-radius: 4px; transition: 0.2s;
+            margin: 10px 0;
+        }
+        .editable:hover { background: #f5f5ff; outline: 1px dashed #9fa8da; }
+        .editable:focus { background: #e8eaf6; outline: 2px solid #3949ab; }
+    </style>
+</head>
+<body>
+
+<div class="editor-wrap">
+    <!-- 🤖 แชท AI ผู้ช่วย -->
+    <div class="chat-box">
         <h3>🤖 AI ผู้ช่วย</h3>
-        <div id="chat"></div>
-        <input id="inp" placeholder="สั่งงาน เช่น เปลี่ยนหัวข้อหน้าแรกเป็น...">
-        <button onclick="send()">ส่ง</button>
-    </div>
-    <!-- ตัวอย่างหน้าเว็บ คลิกแก้ได้ -->
-    <div style="flex:1;padding:20px">
-        <h3>🖥️ คลิกข้อความเพื่อแก้ไข</h3>
-        <div contenteditable="true" onblur="save('title',this.innerText)">
-            {{ data.title or "Nexus S3" }}
+        <div class="chat-log" id="chat"></div>
+        <div class="chat-input">
+            <input id="inp" placeholder="สั่งงาน เช่น เปลี่ยนหัวข้อหน้าแรกเป็น...">
+            <button onclick="send()">ส่ง</button>
         </div>
-        <p contenteditable="true" onblur="save('desc',this.innerText)">
-            {{ data.desc or "ระบบภาษาอัจฉริยะ" }}
+    </div>
+
+    <!-- 🖥️ ตัวอย่างหน้าเว็บ คลิกแก้ได้โดยตรง -->
+    <div class="preview-area">
+        <h3>🖥️ คลิกข้อความเพื่อแก้ไข</h3>
+        
+        <h1 class="editable" contenteditable="true" onblur="save('title', this.innerText)">
+            {{ data.title or "Nexus S3" }}
+        </h1>
+        
+        <p class="editable" contenteditable="true" onblur="save('desc', this.innerText)">
+            {{ data.desc or "ระบบภาษาอัจฉริยะ เชื่อมทุกความหมายทั่วโลก" }}
+        </p>
+
+        <p class="editable" contenteditable="true" onblur="save('slogan', this.innerText)">
+            {{ data.slogan or "ยึดภาษาไทยเป็นแก่นกลาง" }}
         </p>
     </div>
 </div>
+
 <script>
-function send(){
-    t = document.getElementById('inp').value
-    fetch('/api/cmd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})})
+// เพิ่มข้อความแสดงในแชท
+function addMsg(text, isUser = false) {
+    const box = document.getElementById('chat');
+    const m = document.createElement('div');
+    m.className = `msg ${isUser ? 'user' : 'ai'}`;
+    m.innerText = text;
+    box.appendChild(m);
+    box.scrollTop = box.scrollHeight;
 }
-function save(f,v){
-    fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p:'index',f:f,v:v})})
+
+// ส่งคำสั่งไปยัง AI/ระบบ
+function send() {
+    const input = document.getElementById('inp');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMsg(text, true);
+    input.value = '';
+
+    fetch('/api/cmd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+    })
+    .then(r => r.json())
+    .then(r => addMsg(r.res || '✅ ทำเรียบร้อยแล้ว'));
 }
+
+// บันทึกการแก้ไขเนื้อหา
+function save(field, value) {
+    fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p: 'index', f: field, v: value.trim() })
+    });
+}
+
+// กด Enter ส่งคำสั่ง
+document.getElementById('inp').addEventListener('keypress', e => {
+    if (e.key === 'Enter') send();
+});
+
+// ข้อความต้อนรับตอนเปิดหน้า
+addMsg('สวัสดีครับ! สั่งงานผมได้เลย หรือคลิกแก้ข้อความฝั่งขวาได้โดยตรงครับ');
 </script>
 
+</body>
+</html>
