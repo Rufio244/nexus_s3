@@ -44,4 +44,9 @@ def save():
 def out(): session.clear(); return redirect("/")
 
 if __name__ == "__main__": app.run(port=8080, debug=True)
+@app.route("/dashboard")
+def dash():
+    if session.get("plan") != "PRANAI":
+        return redirect("/login")
+    return render_template("dashboard.html", data=cms.get("index"))
 
