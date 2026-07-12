@@ -1,1 +1,29 @@
+<div style="display:flex;height:90vh">
+    <!-- แชท AI -->
+    <div style="width:30%;background:#f5f5ff;padding:15px;overflow:auto">
+        <h3>🤖 AI ผู้ช่วย</h3>
+        <div id="chat"></div>
+        <input id="inp" placeholder="สั่งงาน เช่น เปลี่ยนหัวข้อหน้าแรกเป็น...">
+        <button onclick="send()">ส่ง</button>
+    </div>
+    <!-- ตัวอย่างหน้าเว็บ คลิกแก้ได้ -->
+    <div style="flex:1;padding:20px">
+        <h3>🖥️ คลิกข้อความเพื่อแก้ไข</h3>
+        <div contenteditable="true" onblur="save('title',this.innerText)">
+            {{ data.title or "Nexus S3" }}
+        </div>
+        <p contenteditable="true" onblur="save('desc',this.innerText)">
+            {{ data.desc or "ระบบภาษาอัจฉริยะ" }}
+        </p>
+    </div>
+</div>
+<script>
+function send(){
+    t = document.getElementById('inp').value
+    fetch('/api/cmd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})})
+}
+function save(f,v){
+    fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({p:'index',f:f,v:v})})
+}
+</script>
 
