@@ -49,4 +49,33 @@ def dash():
     if session.get("plan") != "PRANAI":
         return redirect("/login")
     return render_template("dashboard.html", data=cms.get("index"))
+# 📌 เพิ่ม import ด้านบน
+from models import core, biz, cms, sys_lock
+
+# 📌 เพิ่มเป็นอันดับแรก ก่อนทุกหน้า
+@app.before_request
+def check_system_lock():
+    # อนุญาตเฉพาะหน้าปลดล็อค และส่วนตรวจสอบรหัส
+    if not sys_lock.check_access() and request.path not in ["/unlock-system", "/api/check-unlock"]:
+        return redirect("/unlock-system")
+
+# 📌 เพิ่มหน้าจอปลดล็อค
+@app.route("/unlock-system", methods=["GET","POST"])
+def unlock_page():
+    if request.method == "POST":
+        res = sys_lock.unlock(request.form["master_code"])
+        if res["ok"]:
+            return redirect("/dashboard")
+        return render_template("unlock.html", msg=res["msg"])
+    return render_template("unlock.html")
+
+# 📌 เพิ่ม API ควบคุมล็อค-ปลดล็อค
+@app.route("/api/lock-all", methods=["POST"])
+def lock_all():
+    data = request.json
+    return jsonify(sys_lock.lock_all(data["code"]))
+
+@app.route("/api/status-system")
+def sys_status():
+    return jsonify({"locked": sys_lock.system_locked})
 
