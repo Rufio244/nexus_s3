@@ -40,11 +40,3 @@ jobs:
 - ทุกอย่างทำงานต่อเนื่อง ไม่ต้องกดปุ่มอะไรเพิ่มเติมเลยครับ!" 🤖🌐
 
 **ระบบอัตโนมัติครบถ้วนแล้วครับพี่! ทดสอบด้วยการสร้างรีโปตัวอย่างไหมครับ? 🤝✨**
-{
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
-  "git": {
-    "deploymentEnabled": { "main": true }
-  }
-}
